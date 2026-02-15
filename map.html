@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Live Map Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+<h2>Dashboard - Live Location</h2>
+<div id="map" style="height:500px;"></div>
+
+<script>
+const map = L.map('map').setView([0,0],2);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+let markers = {}; // لتتبع كل مستخدم
+
+const socket = io();
+
+socket.on("location-update", (data) => {
+  const id = "user"; // لو عندك معرف لكل مستخدم استخدمه هنا
+  if(markers[id]) map.removeLayer(markers[id]);
+  markers[id] = L.marker([data.lat, data.lon]).addTo(map);
+  map.setView([data.lat, data.lon], 15);
+});
+</script>
+</body>
+</html>
